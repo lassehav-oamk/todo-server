@@ -1,0 +1,70 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Todoels server app
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /todos:
+    get:
+      description: Returns list of todos
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/TodoObjectRead'
+    post:
+      summary: Add a new pet
+      description: Add new todo
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: todo
+          description: New todo item
+          required: true
+          schema:
+            $ref: '#/definitions/TodoObjectCreate'
+      responses:
+        200:
+          description: OK
+# complex objects have schema definitions
+definitions:
+  TodoObjectRead:
+    properties:
+      id:
+        type: integer
+        example: 53
+      description:
+        type: string
+        example: "Hello World object"
+      dueDate:
+        type: string
+        example: "2017-10-20"
+      type: 
+        type: string
+        example: "chore"
+      isDone:
+        type: boolean
+        example: false
+  TodoObjectCreate:
+    properties:
+      description:
+        type: string
+      dueDate:
+        type: string
+      type: 
+        type: string
+      isDone:
+        type: boolean

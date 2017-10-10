@@ -17,16 +17,18 @@ produces:
   - application/json
 paths:
   /todos:
+    x-swagger-router-controller: todos
     get:
-      description: Returns list of todos
+      description: Returns array of todos
+      operationId: todosGet
       responses:
         "200":
           description: Success
           schema:
             $ref: '#/definitions/TodoObjectRead'
-    post:
-      summary: Add a new pet
+    post:      
       description: Add new todo
+      operationId: todosPost
       consumes:
         - application/json
       parameters:

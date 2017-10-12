@@ -5,6 +5,7 @@
 */
 
 
+const uuidv4 = require('uuid/v4');
 
 /*
  Once you 'require' a module you can reference the things that it exports.  These are defined in module.exports.
@@ -41,8 +42,10 @@ function todosGet(req, res) {
   res.json(todos);
 }
 
-function todosPost(req, res) {    
-    //req.swagger.params.body.value.todo    
+function todosPost(req, res) {        
     console.log(req.swagger.params.todo.value);
+    var todo = req.swagger.params.todo.value;
+    todo.id = uuidv4();
+    todos.push(todo);
     res.json();
   }

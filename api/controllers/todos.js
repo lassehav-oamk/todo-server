@@ -1,51 +1,76 @@
 'use strict';
-/*
- 'use strict' is not required but helpful for turning syntactical errors into true errors in the program flow
- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
-*/
+const Datastore = require('@google-cloud/datastore');
+const datastore = Datastore();
 
-
-const uuidv4 = require('uuid/v4');
-
-/*
- Once you 'require' a module you can reference the things that it exports.  These are defined in module.exports.
-
- For a controller in a127 (which this is) you should export the functions referenced in your Swagger document by name.
-
- Either:
-  - The HTTP Verb of the corresponding operation (get, put, post, delete, etc)
-  - Or the operationId associated with the operation in your Swagger document
-
-  In the starter/skeleton project the 'get' operation on the '/hello' path has an operationId named 'hello'.  Here,
-  we specify that in the exports of this module that 'hello' maps to the function named 'hello'
- */
 module.exports = {
-  todosPost: todosPost,
-  todosGet: todosGet
+    todosPost,
+    todosGet
 };
 
-let todos = [{
+// todo
+/*
+{
     id: 1,
     description: "Get milk",
     dueDate: "2017-10-30",
     type: "chore",
     isDone: false
-}];
+}*/
 
-/*
-  Functions in a127 controllers used for operations should take two parameters:
-
-  Param 1: a handle to the request object
-  Param 2: a handle to the response object
- */
 function todosGet(req, res) {
-  res.json(todos);
+
+    const query = datastore.createQuery('Todo');
+
+    datastore.runQuery(query)
+        .then((results) => {
+            let tasks = results[0];
+
+            tasks = tasks.map((task) => {
+                const taskKey = task[datastore.KEY];
+                console.log(taskKey.id, task);
+                task.id = taskKey.id;
+                return task;
+            });
+            res.json(tasks);
+        })
+        .catch((err) => {
+            console.error('ERROR:', err);
+            res.sendStatus(500);
+        });
 }
 
-function todosPost(req, res) {        
-    console.log(req.swagger.params.todo.value);
-    var todo = req.swagger.params.todo.value;
-    todo.id = uuidv4();
-    todos.push(todo);
-    res.json();
-  }
+function todosPost(req, res) {
+    const postData = req.swagger.params.todo.value;
+    const taskKey = datastore.key('Todo');
+    const entity = {
+        key: taskKey,
+        data: [
+            {
+                name: 'description',
+                value: postData.description
+            },
+            {
+                name: 'dueDate',
+                value: new Date(postData.dueDate).toJSON()
+            },
+            {
+                name: 'type',
+                value: postData.type
+            },
+            {
+                name: 'isDone',
+                value: false
+            }
+        ]
+    };
+
+    datastore.save(entity)
+        .then(() => {
+            console.log(`Task ${taskKey.id} created successfully.`);
+            res.sendStatus(201);
+        })
+        .catch((err) => {
+            console.error('ERROR:', err);
+            res.sendStatus(500);
+        });
+}

@@ -4,9 +4,9 @@ info:
   title: Todoels server app
 # during dev, should point to your local machine
 host: localhost:10010
-# basePath prefixes all resource paths 
+# basePath prefixes all resource paths
 basePath: /
-# 
+#
 schemes:
   - https
 # format of bodies a client can send (Content-Type)
@@ -26,9 +26,12 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/TodoObjectRead'
-    post:      
+    post:
       description: Add new todo
       operationId: todosPost
+      produces:
+        - text/plain
+        - application/json
       consumes:
         - application/json
       parameters:
@@ -54,7 +57,7 @@ definitions:
       dueDate:
         type: string
         example: "2017-10-20"
-      type: 
+      type:
         type: string
         example: "chore"
       isDone:
@@ -66,7 +69,7 @@ definitions:
         type: string
       dueDate:
         type: string
-      type: 
+      type:
         type: string
       isDone:
         type: boolean

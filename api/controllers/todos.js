@@ -4,7 +4,8 @@ const datastore = Datastore();
 
 module.exports = {
     todosPost,
-    todosGet
+    todosGet,
+    isDoneToggle
 };
 
 // todo
@@ -73,4 +74,32 @@ function todosPost(req, res) {
             console.error('ERROR:', err);
             res.sendStatus(500);
         });
+}
+
+function isDoneToggle(req, res) {
+
+    const todoId = req.swagger.params.todoId.value;
+
+    let key;
+    if (todoId) {
+        key = datastore.key(["Todo", parseInt(todoId, 10)]);
+    }
+    else
+    {
+        res.sendStatus(404);
+    }    
+    key.id = todoId;
+
+    datastore.get(key).then(results => {            
+        let todoEntity = results[0];      
+        todoEntity.isDone = !todoEntity.isDone;
+        datastore.update({
+            key: key,
+            data: todoEntity
+        }).then(() => {       
+            res.sendStatus(200);
+        }).catch(err => {        
+            res.sendStatus(404);
+        })
+    })  
 }
